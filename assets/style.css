@@ -1,0 +1,21 @@
+#board {
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  grid-template-columns: repeat(8, 1fr);
+  width: 80vh;
+  height: 80vh;
+  margin: auto;
+  border: darkgreen solid;
+}
+
+.cell {
+  background-color: green;
+  border: darkgreen solid;
+}
+
+.stone {
+  width: 90%;
+  height: 90%;
+  margin: 5%;
+  border-radius: 50%;
+}

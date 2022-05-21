@@ -1,5 +1,5 @@
 pub struct Board {
-    data: u64
+    pub data: u64
 }
 
 const GUARD_X: u64 = 0x7e7e7e7e7e7e7e7e;
@@ -11,9 +11,9 @@ impl Board {
         Board { data }
     }
 
-    fn line_left(&self, other: u64, position: i32) -> u64 {
+    fn line_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_X;
-        let mut result = mask & (1 << position - 1) as u64;
+        let mut result = mask & position >> 1 as u64;
         result |= mask & (result >> 1);
         result |= mask & (result >> 1);
         result |= mask & (result >> 1);
@@ -26,9 +26,9 @@ impl Board {
         }
     }
 
-    fn line_right(&self, other: u64, position: i32) -> u64 {
+    fn line_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_X;
-        let mut result = mask & (1 << position + 1) as u64;
+        let mut result = mask & position << 1 as u64;
         result |= mask & (result << 1);
         result |= mask & (result << 1);
         result |= mask & (result << 1);
@@ -41,9 +41,9 @@ impl Board {
         }
     }
 
-    fn line_upper(&self, other: u64, position: i32) -> u64 {
+    fn line_upper(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_Y;
-        let mut result = mask & (1 << position - 8) as u64;
+        let mut result = mask & position >> 8 as u64;
         result |= mask & (result >> 8);
         result |= mask & (result >> 8);
         result |= mask & (result >> 8);
@@ -56,9 +56,9 @@ impl Board {
         }
     }
 
-    fn line_lower(&self, other: u64, position: i32) -> u64 {
+    fn line_lower(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_Y;
-        let mut result = mask & (1 << position + 8) as u64;
+        let mut result = mask & position << 8 as u64;
         result |= mask & (result << 8);
         result |= mask & (result << 8);
         result |= mask & (result << 8);
@@ -71,9 +71,9 @@ impl Board {
         }
     }
 
-    fn line_upper_left(&self, other: u64, position: i32) -> u64 {
+    fn line_upper_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & (1 << position - 9) as u64;
+        let mut result = mask & position >> 9 as u64;
         result |= mask & (result >> 9);
         result |= mask & (result >> 9);
         result |= mask & (result >> 9);
@@ -86,9 +86,9 @@ impl Board {
         }
     }
 
-    fn line_upper_right(&self, other: u64, position: i32) -> u64 {
+    fn line_upper_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & (1 << position - 7) as u64;
+        let mut result = mask & position >> 7 as u64;
         result |= mask & (result >> 7);
         result |= mask & (result >> 7);
         result |= mask & (result >> 7);
@@ -101,9 +101,9 @@ impl Board {
         }
     }
 
-    fn line_lower_left(&self, other: u64, position: i32) -> u64 {
+    fn line_lower_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & (1 << position + 7) as u64;
+        let mut result = mask & position << 7 as u64;
         result |= mask & (result << 7);
         result |= mask & (result << 7);
         result |= mask & (result << 7);
@@ -116,9 +116,9 @@ impl Board {
         }
     }
 
-    fn line_lower_right(&self, other: u64, position: i32) -> u64 {
+    fn line_lower_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & (1 << position + 9) as u64;
+        let mut result = mask & position << 9 as u64;
         result |= mask & (result << 9);
         result |= mask & (result << 9);
         result |= mask & (result << 9);
@@ -131,8 +131,8 @@ impl Board {
         }
     }
 
-    fn get_reverse(&self, other: u64, position: i32) -> u64 {
-        if (self.data | other )>> position & 1 > 0 {
+    fn get_reverse(&self, other: u64, position: u64) -> u64 {
+        if (self.data | other ) & position > 0 {
             return 0;
         }
         let mut result = 0;
@@ -147,9 +147,9 @@ impl Board {
         result
     }
 
-    pub fn put(&mut self, other: &mut Board, position: i32) {
+    pub fn put(&mut self, other: &mut Board, position: u64) {
         let reversed = self.get_reverse(other.data, position);
-        self.data |= 1 << position | reversed;
+        self.data |= position | reversed;
         other.data ^= reversed;
     }
 

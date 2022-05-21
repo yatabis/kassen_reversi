@@ -64,9 +64,8 @@ const board = {
       this.socket.send(`${this.turn}: ${id}`);
     },
     receive(msg) {
-      console.log(msg);
-      const [black, white] = msg.split(' ').map(text => BigInt(text));
-      this.update(black, white);
+      const { black, white } = JSON.parse(msg);
+      this.update(BigInt(black), BigInt(white));
     }
   }
 };

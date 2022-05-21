@@ -10,20 +10,18 @@ use axum::routing::{get, get_service};
 use futures::SinkExt;
 use tokio::sync::broadcast;
 use tower_http::services::ServeDir;
-use kassen_reversi::board::Board;
+use kassen_reversi::game::{Game, Turn};
 
 struct AppState {
-    black: Mutex<Board>,
-    white: Mutex<Board>,
+    game: Mutex<Game>,
     tx: broadcast::Sender<String>,
 }
 
 #[tokio::main]
 async fn main() {
-    let black = Mutex::new(Board::new(0x0000000810000000));
-    let white = Mutex::new(Board::new(0x0000001008000000));
+    let game = Mutex::new(Game::new());
     let (tx, _) = broadcast::channel(100);
-    let app_state = Arc::new(AppState { black, white, tx });
+    let app_state = Arc::new(AppState { game, tx });
     let app = Router::new()
         .fallback(
             get_service(
@@ -53,13 +51,9 @@ async fn ws_handler(ws: WebSocketUpgrade, Extension(state): Extension<Arc<AppSta
 async fn handle(stream: WebSocket, state: Arc<AppState>) {
     let (mut sender, mut receiver) = stream.split();
     let mut rx = state.tx.subscribe();
-    let black = state.black.lock().unwrap().data;
-    let white = state.white.lock().unwrap().data;
-    if sender.send(Message::Text(format!("{} {}", black, white))).await.is_err() {
+    if sender.send(Message::Text(serde_json::to_string(&state.game).unwrap())).await.is_err() {
         return;
     }
-    drop(black);
-    drop(white);
 
     let mut send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
@@ -74,20 +68,13 @@ async fn handle(stream: WebSocket, state: Arc<AppState>) {
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             println!("recv {}", text);
             let msg = text.split(": ").collect::<Vec<&str>>();
-            let turn = msg[0];
-            let mut black = state.black.lock().unwrap();
-            let mut white = state.white.lock().unwrap();
-            if let Ok(position) = msg[1].parse::<i32>() {
-                println!("turn :{}\nposition: {}", turn, position);
-                match turn {
-                    "1" => black.put(&mut white, 1 << position),
-                    "2" => white.put(&mut black, 1 << position),
-                    _ => {},
+            if let Some(turn) = Turn::parse(msg[0]) {
+                if let Ok(position) = msg[1].parse::<i32>() {
+                    println!("turn :{:?}\nposition: {}", turn, position);
+                    state.game.lock().unwrap().put(&turn, &position);
                 }
+                let _ = state.tx.send(serde_json::to_string(&state.game).unwrap());
             }
-            let _ = state.tx.send(format!("{} {}", black.data, white.data));
-            drop(black);
-            drop(white);
         }
     });
 

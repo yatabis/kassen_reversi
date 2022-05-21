@@ -1,6 +1,7 @@
-pub struct Board {
-    pub data: u64
-}
+use serde::Serialize;
+
+#[derive(Serialize)]
+pub struct Board(u64);
 
 const GUARD_X: u64 = 0x7e7e7e7e7e7e7e7e;
 const GUARD_Y: u64 = 0x00ffffffffffff00;
@@ -8,7 +9,7 @@ const GUARD_XY: u64 = 0x007e7e7e7e7e7e00;
 
 impl Board {
     pub fn new(data: u64) -> Board {
-        Board { data }
+        Board(data)
     }
 
     fn line_left(&self, other: u64, position: u64) -> u64 {
@@ -19,7 +20,7 @@ impl Board {
         result |= mask & (result >> 1);
         result |= mask & (result >> 1);
         result |= mask & (result >> 1);
-        if self.data & result >> 1 > 1{
+        if self.0 & result >> 1 > 1{
             result
         } else {
             0
@@ -34,7 +35,7 @@ impl Board {
         result |= mask & (result << 1);
         result |= mask & (result << 1);
         result |= mask & (result << 1);
-        if self.data & result << 1 > 1{
+        if self.0 & result << 1 > 1{
             result
         } else {
             0
@@ -49,7 +50,7 @@ impl Board {
         result |= mask & (result >> 8);
         result |= mask & (result >> 8);
         result |= mask & (result >> 8);
-        if self.data & result >> 8 > 1{
+        if self.0 & result >> 8 > 1{
             result
         } else {
             0
@@ -64,7 +65,7 @@ impl Board {
         result |= mask & (result << 8);
         result |= mask & (result << 8);
         result |= mask & (result << 8);
-        if self.data & result << 8 > 1{
+        if self.0 & result << 8 > 1{
             result
         } else {
             0
@@ -79,7 +80,7 @@ impl Board {
         result |= mask & (result >> 9);
         result |= mask & (result >> 9);
         result |= mask & (result >> 9);
-        if self.data & result >> 9 > 1{
+        if self.0 & result >> 9 > 1{
             result
         } else {
             0
@@ -94,7 +95,7 @@ impl Board {
         result |= mask & (result >> 7);
         result |= mask & (result >> 7);
         result |= mask & (result >> 7);
-        if self.data & result >> 7 > 1{
+        if self.0 & result >> 7 > 1{
             result
         } else {
             0
@@ -109,7 +110,7 @@ impl Board {
         result |= mask & (result << 7);
         result |= mask & (result << 7);
         result |= mask & (result << 7);
-        if self.data & result << 7 > 1{
+        if self.0 & result << 7 > 1{
             result
         } else {
             0
@@ -124,7 +125,7 @@ impl Board {
         result |= mask & (result << 9);
         result |= mask & (result << 9);
         result |= mask & (result << 9);
-        if self.data & result << 9 > 1{
+        if self.0 & result << 9 > 1{
             result
         } else {
             0
@@ -132,7 +133,7 @@ impl Board {
     }
 
     fn get_reverse(&self, other: u64, position: u64) -> u64 {
-        if (self.data | other ) & position > 0 {
+        if (self.0 | other ) & position > 0 {
             return 0;
         }
         let mut result = 0;
@@ -148,15 +149,16 @@ impl Board {
     }
 
     pub fn put(&mut self, other: &mut Board, position: u64) {
-        let reversed = self.get_reverse(other.data, position);
-        self.data |= position | reversed;
-        other.data ^= reversed;
+        let reversed = self.get_reverse(other.0, position);
+        if reversed == 0 { return; }
+        self.0 |= position | reversed;
+        other.0 ^= reversed;
     }
 
     pub fn preview(&self) {
         for i in 0..8 {
             for j in 0..8 {
-                print!("{}", self.data >> i * 8 + j & 1);
+                print!("{}", self.0 >> i * 8 + j & 1);
             }
             print!("\n");
         }

@@ -6,10 +6,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="board">
-  <template v-for="(row, i) in board">
-    <cell v-for="(stone, j) in row" :id="i * 8 + j" :stone="stone" @put="put"></cell>
-  </template>
+<div id="app">
+  <div class="board">
+    <template v-for="(row, i) in board">
+      <cell v-for="(stone, j) in row" :id="i * 8 + j" :stone="stone" @put="put"></cell>
+    </template>
+  </div>
+  <panel :turn="turn" @change-turn="changeTurn"></panel>
 </div>
 <script src="https://unpkg.com/vue@next"></script>
 <script src="app.js"></script>

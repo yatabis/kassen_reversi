@@ -20,9 +20,25 @@ const cell = {
   }
 };
 
-const board = {
+const panel = {
+  template: `<div class="panel">
+  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.BLACK} }" @click="onClick(${STONE.BLACK})"><div class="panel-stone panel-black"></div></div>
+  <div class="panel-info"></div>
+  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.WHITE} }" @click="onClick(${STONE.WHITE})"><div class="panel-stone panel-white"></div></div>
+</div>`,
+  props: ['turn'],
+  emits: ['changeTurn'],
+  methods: {
+    onClick(turn) {
+      this.$emit('changeTurn', turn);
+    }
+  }
+};
+
+const app = {
   components: {
     'cell': cell,
+    'panel': panel,
   },
   data() {
     return {
@@ -63,12 +79,14 @@ const board = {
     put(id) {
       this.socket.send(`${this.turn}: ${id}`);
     },
+    changeTurn(turn) {
+      this.turn = turn;
+    },
     receive(msg) {
       const { black, white } = JSON.parse(msg);
       this.update(BigInt(black), BigInt(white));
     }
   }
 };
-// 日本語を書くテスト
 
-Vue.createApp(board).mount('#board');
+Vue.createApp(app).mount('#app');

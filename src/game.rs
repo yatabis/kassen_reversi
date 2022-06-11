@@ -20,6 +20,8 @@ impl Turn {
 pub struct Game {
     black: Board,
     white: Board,
+    black_count: i32,
+    white_count: i32,
 }
 
 impl Game {
@@ -27,6 +29,8 @@ impl Game {
         Game {
             black: Board::new(0x0000000810000000),
             white: Board::new(0x0000001008000000),
+            black_count: 2,
+            white_count: 2,
         }
     }
 
@@ -35,5 +39,7 @@ impl Game {
             Turn::Black => self.black.put(&mut self.white, 1 << position),
             Turn::White => self.white.put(&mut self.black, 1 << position),
         }
+        self.black_count = self.black.count();
+        self.white_count = self.white.count();
     }
 }

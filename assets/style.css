@@ -38,6 +38,12 @@
 }
 
 .panel-info {
+  display: grid;
+  grid-template-columns: 3fr 1fr 3fr;
+  justify-items: center;
+  align-items: center;
+  font-size: 5vh;
+  font-weight: bold;
   background-color: green;
   border-bottom: darkgreen solid;
 }

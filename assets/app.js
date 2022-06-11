@@ -23,10 +23,10 @@ const cell = {
 const panel = {
   template: `<div class="panel">
   <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.BLACK} }" @click="onClick(${STONE.BLACK})"><div class="panel-stone panel-black"></div></div>
-  <div class="panel-info"></div>
+  <div class="panel-info"><span>{{ count.black }}</span><span>-</span><span>{{ count.white }}</span></div>
   <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.WHITE} }" @click="onClick(${STONE.WHITE})"><div class="panel-stone panel-white"></div></div>
 </div>`,
-  props: ['turn'],
+  props: ['turn', 'count'],
   emits: ['changeTurn'],
   methods: {
     onClick(turn) {
@@ -44,6 +44,10 @@ const app = {
     return {
       board: [...Array(8)].map(() => Array(8).fill(0)),
       turn: STONE.BLACK,
+      count: {
+        black: 0,
+        white: 0,
+      },
       socket: undefined,
     }
   },
@@ -83,8 +87,10 @@ const app = {
       this.turn = turn;
     },
     receive(msg) {
-      const { black, white } = JSON.parse(msg);
+      const { black, white, black_count, white_count } = JSON.parse(msg);
       this.update(BigInt(black), BigInt(white));
+      this.count.black = black_count;
+      this.count.white = white_count;
     }
   }
 };

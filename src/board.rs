@@ -12,6 +12,10 @@ impl Board {
         Board(data)
     }
 
+    pub fn count(&self) -> i32 {
+        self.0.count_ones() as i32
+    }
+
     fn line_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_X;
         let mut result = mask & position >> 1 as u64;

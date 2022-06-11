@@ -1,6 +1,7 @@
 use futures::stream::StreamExt;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
+use serde::Deserialize;
 use axum::response::IntoResponse;
 use axum::Router;
 use axum::extract::Extension;
@@ -15,6 +16,13 @@ use kassen_reversi::game::{Game, Turn};
 struct AppState {
     game: Mutex<Game>,
     tx: broadcast::Sender<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type")]
+enum WsMessage {
+    Put { turn: Turn, position: i32 },
+    Retry,
 }
 
 #[tokio::main]
@@ -66,12 +74,17 @@ async fn handle(stream: WebSocket, state: Arc<AppState>) {
 
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
-            println!("recv {}", text);
-            let msg = text.split(": ").collect::<Vec<&str>>();
-            if let Some(turn) = Turn::parse(msg[0]) {
-                if let Ok(position) = msg[1].parse::<i32>() {
-                    println!("turn :{:?}\nposition: {}", turn, position);
-                    state.game.lock().unwrap().put(&turn, &position);
+            let message = serde_json::from_str::<WsMessage>(&text);
+            println!("recv {} {:?}", text, message);
+            if let Ok(msg) = message {
+                match msg {
+                    WsMessage::Put { turn, position } => {
+                        println!("turn :{:?}\nposition: {}", turn, position);
+                        state.game.lock().unwrap().put(&turn, &position);
+                    }
+                    WsMessage::Retry => {
+                        *state.game.lock().unwrap() = Game::new();
+                    }
                 }
                 let _ = state.tx.send(serde_json::to_string(&state.game).unwrap());
             }

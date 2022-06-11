@@ -120,6 +120,8 @@ const app = {
             this.board[i][j] = STONE.BLACK;
           } else if (white >> k & 1n) {
             this.board[i][j] = STONE.WHITE;
+          } else {
+            this.board[i][j] = STONE.NONE;
           }
         }
       }
@@ -134,7 +136,11 @@ const app = {
       if (this.turn === STONE.WHITE && this.cooling.white > 0) {
         return;
       }
-      this.socket.send(`${this.turn}: ${id}`);
+      this.socket.send(JSON.stringify({
+        type: 'Put',
+        turn: ['', 'Black', 'White'][this.turn],
+        position: id,
+      }));
       switch (this.turn) {
         case STONE.BLACK: 
           this.cooling.black = COOL_TIME;
@@ -165,7 +171,7 @@ const app = {
       this.turn = turn;
     },
     retry() {
-      console.log('retry!');
+      this.socket.send(JSON.stringify({ type: 'Retry' }));
     },
     receive(msg) {
       const { black, white, black_count, white_count, winner } = JSON.parse(msg);

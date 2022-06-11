@@ -76,7 +76,9 @@ const app = {
     }
   },
   mounted() {
-    const socket = new WebSocket('ws://localhost:3000/ws');
+    const domain = document.domain;
+    console.log(domain);
+    const socket = new WebSocket(`ws://${domain}:3000/ws`);
     socket.onopen = () => {
       console.log('connection opened');
     }

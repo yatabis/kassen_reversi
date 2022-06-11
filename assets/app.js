@@ -55,10 +55,27 @@ const panel = {
   }
 };
 
+const gameInfo = {
+  template: '<div class="game-info"><div class="game-info-text">{{ message }}</div><div class="game-info-button" @click="onClick">はじめから</div></div>',
+  props: ['winner'],
+  emits: ['retry'],
+  computed: {
+    message() {
+      return `${{ Black: '黒', White: '白' }[this.winner]}の勝ち！`;
+    }
+  },
+  methods: {
+    onClick() {
+      this.$emit('retry');
+    }
+  }
+}
+
 const app = {
   components: {
     cell,
     panel,
+    gameInfo,
   },
   data() {
     return {
@@ -72,6 +89,7 @@ const app = {
         black: 0,
         white: 0,
       },
+      winner: undefined,
       socket: undefined,
     }
   },
@@ -107,6 +125,9 @@ const app = {
       }
     },
     put(id) {
+      if (this.winner) {
+        return;
+      }
       if (this.turn === STONE.BLACK && this.cooling.black > 0) {
         return;
       }
@@ -143,11 +164,21 @@ const app = {
     changeTurn(turn) {
       this.turn = turn;
     },
+    retry() {
+      console.log('retry!');
+    },
     receive(msg) {
-      const { black, white, black_count, white_count } = JSON.parse(msg);
+      const { black, white, black_count, white_count, winner } = JSON.parse(msg);
       this.update(BigInt(black), BigInt(white));
       this.count.black = black_count;
       this.count.white = white_count;
+      this.winner = winner;
+      if (winner) {
+        this.cooling = {
+          black: 0,
+          white: 0,
+        };
+      }
     }
   }
 };

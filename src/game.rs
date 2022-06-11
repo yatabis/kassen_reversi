@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::board::Board;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Turn {
     Black,
     White,
@@ -22,6 +22,7 @@ pub struct Game {
     white: Board,
     black_count: i32,
     white_count: i32,
+    winner: Option<Turn>,
 }
 
 impl Game {
@@ -31,6 +32,7 @@ impl Game {
             white: Board::new(0x0000001008000000),
             black_count: 2,
             white_count: 2,
+            winner: None,
         }
     }
 
@@ -41,5 +43,7 @@ impl Game {
         }
         self.black_count = self.black.count();
         self.white_count = self.white.count();
+        if self.black_count == 0 { self.winner = Some(Turn::White); }
+        if self.white_count == 0 { self.winner = Some(Turn::Black); }
     }
 }

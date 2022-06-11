@@ -12,7 +12,7 @@
       <cell v-for="(stone, j) in row" :id="i * 8 + j" :stone="stone" @put="put"></cell>
     </template>
   </div>
-  <panel :turn="turn" :count="count" @change-turn="changeTurn"></panel>
+  <panel :turn="turn" :count="count" :cooling="cooling" @change-turn="changeTurn"></panel>
 </div>
 <script src="https://unpkg.com/vue@next"></script>
 <script src="app.js"></script>

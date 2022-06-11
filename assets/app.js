@@ -1,3 +1,6 @@
+const COOL_TIME = 1000;
+const COOLING_INTERVAL = 10;
+
 const STONE = {
   NONE: 0,
   BLACK: 1,
@@ -20,13 +23,30 @@ const cell = {
   }
 };
 
+const coolTimeIndicator = {
+  template: '<div class="panel-disabled" :style="background"></div>',
+  props: ['coolTime'],
+  computed: {
+    background() {
+      const degree = (1 - this.coolTime / COOL_TIME) * 100;
+      const background = degree === 100 ? 'transparent' : `radial-gradient(circle, transparent 4vh, rgba(0, 128, 0) 4vh), conic-gradient(transparent 0% ${degree}%, rgb(0, 128, 0) ${degree}% 100%)`;
+      return {
+        background
+      };
+    }
+  }
+}
+
 const panel = {
   template: `<div class="panel">
-  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.BLACK} }" @click="onClick(${STONE.BLACK})"><div class="panel-stone panel-black"></div></div>
+  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.BLACK} }" @click="onClick(${STONE.BLACK})"><coolTimeIndicator :coolTime="cooling.black"></coolTimeIndicator><div class="panel-stone panel-black"></div></div>
   <div class="panel-info"><span>{{ count.black }}</span><span>-</span><span>{{ count.white }}</span></div>
-  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.WHITE} }" @click="onClick(${STONE.WHITE})"><div class="panel-stone panel-white"></div></div>
+  <div class="panel-item" :class="{ 'panel-active': turn === ${STONE.WHITE} }" @click="onClick(${STONE.WHITE})"><coolTimeIndicator :coolTime="cooling.white"></coolTimeIndicator><div class="panel-stone panel-white"></div></div>
 </div>`,
-  props: ['turn', 'count'],
+  components: {
+    coolTimeIndicator,
+  },
+  props: ['turn', 'count', 'cooling'],
   emits: ['changeTurn'],
   methods: {
     onClick(turn) {
@@ -37,14 +57,18 @@ const panel = {
 
 const app = {
   components: {
-    'cell': cell,
-    'panel': panel,
+    cell,
+    panel,
   },
   data() {
     return {
       board: [...Array(8)].map(() => Array(8).fill(0)),
       turn: STONE.BLACK,
       count: {
+        black: 0,
+        white: 0,
+      },
+      cooling: {
         black: 0,
         white: 0,
       },
@@ -81,7 +105,38 @@ const app = {
       }
     },
     put(id) {
+      if (this.turn === STONE.BLACK && this.cooling.black > 0) {
+        return;
+      }
+      if (this.turn === STONE.WHITE && this.cooling.white > 0) {
+        return;
+      }
       this.socket.send(`${this.turn}: ${id}`);
+      switch (this.turn) {
+        case STONE.BLACK: 
+          this.cooling.black = COOL_TIME;
+          break;
+        case STONE.WHITE:
+          this.cooling.white = COOL_TIME;
+          break;
+      }
+      setTimeout(this.cool, COOLING_INTERVAL, this.turn);
+    },
+    cool(turn) {
+      switch (turn) {
+        case STONE.BLACK:
+          this.cooling.black -= COOLING_INTERVAL;
+          if (this.cooling.black > 0) {
+            setTimeout(this.cool, COOLING_INTERVAL, STONE.BLACK);
+          }
+          break;
+        case STONE.WHITE:
+          this.cooling.white -= COOLING_INTERVAL;
+          if (this.cooling.white > 0) {
+            setTimeout(this.cool, COOLING_INTERVAL, STONE.WHITE);
+          }
+          break;
+      }
     },
     changeTurn(turn) {
       this.turn = turn;

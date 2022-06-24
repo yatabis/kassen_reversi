@@ -140,6 +140,19 @@ impl Board {
         other.0 ^= reversed;
     }
 
+    pub fn get_legal_move(&self, other: &Board) -> u64 {
+        let mut result = 0;
+        result |= self.line_left(other.0, self.0) >> 1;
+        result |= self.line_right(other.0, self.0) << 1;
+        result |= self.line_upper(other.0, self.0) >> 8;
+        result |= self.line_lower(other.0, self.0) << 8;
+        result |= self.line_upper_left(other.0, self.0) >> 9;
+        result |= self.line_upper_right(other.0, self.0) >> 7;
+        result |= self.line_lower_left(other.0, self.0) << 7;
+        result |= self.line_lower_right(other.0, self.0) << 9;
+        result & !self.0 & !other.0
+    }
+
     pub fn preview(&self) {
         for i in 0..8 {
             for j in 0..8 {

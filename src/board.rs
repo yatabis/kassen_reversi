@@ -23,122 +23,90 @@ impl Board {
 
     fn line_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_X;
-        let mut result = mask & position >> 1 as u64;
-        result |= mask & (result >> 1);
-        result |= mask & (result >> 1);
-        result |= mask & (result >> 1);
-        result |= mask & (result >> 1);
-        result |= mask & (result >> 1);
-        if self.0 & result >> 1 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position >> 1;
+        result |= mask & result >> 1;
+        result |= mask & result >> 1;
+        result |= mask & result >> 1;
+        result |= mask & result >> 1;
+        result |= mask & result >> 1;
+        result
     }
 
     fn line_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_X;
-        let mut result = mask & position << 1 as u64;
-        result |= mask & (result << 1);
-        result |= mask & (result << 1);
-        result |= mask & (result << 1);
-        result |= mask & (result << 1);
-        result |= mask & (result << 1);
-        if self.0 & result << 1 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position << 1;
+        result |= mask & result << 1;
+        result |= mask & result << 1;
+        result |= mask & result << 1;
+        result |= mask & result << 1;
+        result |= mask & result << 1;
+        result
     }
 
     fn line_upper(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_Y;
-        let mut result = mask & position >> 8 as u64;
-        result |= mask & (result >> 8);
-        result |= mask & (result >> 8);
-        result |= mask & (result >> 8);
-        result |= mask & (result >> 8);
-        result |= mask & (result >> 8);
-        if self.0 & result >> 8 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position >> 8;
+        result |= mask & result >> 8;
+        result |= mask & result >> 8;
+        result |= mask & result >> 8;
+        result |= mask & result >> 8;
+        result |= mask & result >> 8;
+        result
     }
 
     fn line_lower(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_Y;
-        let mut result = mask & position << 8 as u64;
-        result |= mask & (result << 8);
-        result |= mask & (result << 8);
-        result |= mask & (result << 8);
-        result |= mask & (result << 8);
-        result |= mask & (result << 8);
-        if self.0 & result << 8 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position << 8;
+        result |= mask & result << 8;
+        result |= mask & result << 8;
+        result |= mask & result << 8;
+        result |= mask & result << 8;
+        result |= mask & result << 8;
+        result
     }
 
     fn line_upper_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & position >> 9 as u64;
-        result |= mask & (result >> 9);
-        result |= mask & (result >> 9);
-        result |= mask & (result >> 9);
-        result |= mask & (result >> 9);
-        result |= mask & (result >> 9);
-        if self.0 & result >> 9 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position >> 9;
+        result |= mask & result >> 9;
+        result |= mask & result >> 9;
+        result |= mask & result >> 9;
+        result |= mask & result >> 9;
+        result |= mask & result >> 9;
+        result
     }
 
     fn line_upper_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & position >> 7 as u64;
-        result |= mask & (result >> 7);
-        result |= mask & (result >> 7);
-        result |= mask & (result >> 7);
-        result |= mask & (result >> 7);
-        result |= mask & (result >> 7);
-        if self.0 & result >> 7 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position >> 7;
+        result |= mask & result >> 7;
+        result |= mask & result >> 7;
+        result |= mask & result >> 7;
+        result |= mask & result >> 7;
+        result |= mask & result >> 7;
+        result
     }
 
     fn line_lower_left(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & position << 7 as u64;
-        result |= mask & (result << 7);
-        result |= mask & (result << 7);
-        result |= mask & (result << 7);
-        result |= mask & (result << 7);
-        result |= mask & (result << 7);
-        if self.0 & result << 7 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position << 7;
+        result |= mask & result << 7;
+        result |= mask & result << 7;
+        result |= mask & result << 7;
+        result |= mask & result << 7;
+        result |= mask & result << 7;
+        result
     }
 
     fn line_lower_right(&self, other: u64, position: u64) -> u64 {
         let mask = other & GUARD_XY;
-        let mut result = mask & position << 9 as u64;
-        result |= mask & (result << 9);
-        result |= mask & (result << 9);
-        result |= mask & (result << 9);
-        result |= mask & (result << 9);
-        result |= mask & (result << 9);
-        if self.0 & result << 9 > 1{
-            result
-        } else {
-            0
-        }
+        let mut result = mask & position << 9;
+        result |= mask & result << 9;
+        result |= mask & result << 9;
+        result |= mask & result << 9;
+        result |= mask & result << 9;
+        result |= mask & result << 9;
+        result
     }
 
     fn get_reverse(&self, other: u64, position: u64) -> u64 {
@@ -146,14 +114,22 @@ impl Board {
             return 0;
         }
         let mut result = 0;
-        result |= self.line_left(other, position);
-        result |= self.line_right(other, position);
-        result |= self.line_upper(other, position);
-        result |= self.line_lower(other, position);
-        result |= self.line_upper_left(other, position);
-        result |= self.line_upper_right(other, position);
-        result |= self.line_lower_left(other, position);
-        result |= self.line_lower_right(other, position);
+        let line = self.line_left(other, position);
+        if self.0 & line >> 1 > 0 { result |= line; }
+        let line = self.line_right(other, position);
+        if self.0 & line << 1 > 0 { result |= line; }
+        let line = self.line_upper(other, position);
+        if self.0 & line >> 8 > 0 { result |= line; }
+        let line = self.line_lower(other, position);
+        if self.0 & line << 8 > 0 { result |= line; }
+        let line = self.line_upper_left(other, position);
+        if self.0 & line >> 9 > 0 { result |= line; }
+        let line = self.line_upper_right(other, position);
+        if self.0 & line >> 7 > 0 { result |= line; }
+        let line = self.line_lower_left(other, position);
+        if self.0 & line << 7 > 0 { result |= line; }
+        let line = self.line_lower_right(other, position);
+        if self.0 & line << 9 > 0 { result |= line; }
         result
     }
 

@@ -16,7 +16,7 @@
     </template>
   </div>
   <panel :turn="turn" :count="count" :cooling="cooling" @change-turn="changeTurn"></panel>
-  <game-info v-if="winner" :winner="winner" @retry="retry"></gameInfo>
+  <game-info v-if="isGameEnd" :winner="state" @retry="retry"></gameInfo>
 </div>
 <script src="https://unpkg.com/vue@next"></script>
 <script src="app.js"></script>

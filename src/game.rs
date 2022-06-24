@@ -17,12 +17,20 @@ impl Turn {
 }
 
 #[derive(Serialize)]
+pub enum State {
+    Black,
+    White,
+    Draw,
+    None,
+}
+
+#[derive(Serialize)]
 pub struct Game {
     black: Board,
     white: Board,
     black_count: i32,
     white_count: i32,
-    winner: Option<Turn>,
+    state: State,
 }
 
 impl Game {
@@ -32,7 +40,7 @@ impl Game {
             white: Board::new(0x0000001008000000),
             black_count: 2,
             white_count: 2,
-            winner: None,
+            state: State::None,
         }
     }
 
@@ -43,7 +51,16 @@ impl Game {
         }
         self.black_count = self.black.count();
         self.white_count = self.white.count();
-        if self.black_count == 0 { self.winner = Some(Turn::White); }
-        if self.white_count == 0 { self.winner = Some(Turn::Black); }
+        if self.black.get_legal_move(&self.white) == 0 && self.white.get_legal_move(&self.black) == 0 {
+            self.state = if self.black_count == self.white_count {
+                State::Draw
+            } else if self.black_count > self.white_count {
+                State::Black
+            } else {
+                State::White
+            }
+        }
+        println!("black: {}", self.black.get_legal_move(&self.white));
+        println!("white: {}", self.white.get_legal_move(&self.black));
     }
 }

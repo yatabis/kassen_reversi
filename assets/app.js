@@ -7,6 +7,13 @@ const STONE = {
   WHITE: 2,
 };
 
+const STATE = {
+  BLACK: 'Black',
+  WHITE: 'White',
+  DRAW: 'Draw',
+  NONE: 'None',
+}
+
 const cell = {
   template: '<div class="cell"><div class="stone" :style="{ backgroundColor }" @click="onClick"></div></div>',
   props: ['id', 'stone'],
@@ -61,7 +68,7 @@ const gameInfo = {
   emits: ['retry'],
   computed: {
     message() {
-      return `${{ Black: '黒', White: '白' }[this.winner]}の勝ち！`;
+      return this.winner === STATE.DRAW ? '引き分け！' : `${{ Black: '黒', White: '白' }[this.winner]}の勝ち！`;
     }
   },
   methods: {
@@ -89,7 +96,7 @@ const app = {
         black: 0,
         white: 0,
       },
-      winner: undefined,
+      state: STATE.NONE,
       socket: undefined,
     }
   },
@@ -111,6 +118,11 @@ const app = {
     }
     this.socket = socket;
   },
+  computed: {
+    isGameEnd() {
+      return this.state !== STATE.NONE;
+    }
+  },
   methods: {
     update(black, white) {
       for (let i = 0n; i < 8n; i++) {
@@ -127,7 +139,7 @@ const app = {
       }
     },
     put(id) {
-      if (this.winner) {
+      if (this.isGameEnd) {
         return;
       }
       if (this.turn === STONE.BLACK && this.cooling.black > 0) {
@@ -174,12 +186,12 @@ const app = {
       this.socket.send(JSON.stringify({ type: 'Retry' }));
     },
     receive(msg) {
-      const { black, white, black_count, white_count, winner } = JSON.parse(msg, (key, value) => ['black', 'white'].includes(key) ? BigInt(value) : value);
+      const { black, white, black_count, white_count, state } = JSON.parse(msg, (key, value) => ['black', 'white'].includes(key) ? BigInt(value) : value);
       this.update(black, white);
       this.count.black = black_count;
       this.count.white = white_count;
-      this.winner = winner;
-      if (winner) {
+      this.state = state;
+      if (this.isGameEnd) {
         this.cooling = {
           black: 0,
           white: 0,

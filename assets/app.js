@@ -113,9 +113,9 @@ const app = {
   },
   methods: {
     update(black, white) {
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          const k = BigInt(i * 8 + j);
+      for (let i = 0n; i < 8n; i++) {
+        for (let j = 0n; j < 8n; j++) {
+          const k = i * 8n + j;
           if (black >> k & 1n) {
             this.board[i][j] = STONE.BLACK;
           } else if (white >> k & 1n) {
@@ -174,8 +174,8 @@ const app = {
       this.socket.send(JSON.stringify({ type: 'Retry' }));
     },
     receive(msg) {
-      const { black, white, black_count, white_count, winner } = JSON.parse(msg);
-      this.update(BigInt(black), BigInt(white));
+      const { black, white, black_count, white_count, winner } = JSON.parse(msg, (key, value) => ['black', 'white'].includes(key) ? BigInt(value) : value);
+      this.update(black, white);
       this.count.black = black_count;
       this.count.white = white_count;
       this.winner = winner;

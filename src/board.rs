@@ -1,11 +1,16 @@
-use serde::Serialize;
-
-#[derive(Serialize)]
-pub struct Board(u64);
+use serde::{Serialize, Serializer};
 
 const GUARD_X: u64 = 0x7e7e7e7e7e7e7e7e;
 const GUARD_Y: u64 = 0x00ffffffffffff00;
 const GUARD_XY: u64 = 0x007e7e7e7e7e7e00;
+
+pub struct Board(u64);
+
+impl Serialize for Board {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str(&self.0.to_string())
+    }
+}
 
 impl Board {
     pub fn new(data: u64) -> Board {

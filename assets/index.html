@@ -1,24 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>合戦リバーシ</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div id="app">
-  <div class="board">
-    <template v-for="(row, i) in board">
-      <cell v-for="(stone, j) in row" :id="i * 8 + j" :stone="stone" @put="put"></cell>
-    </template>
-  </div>
-  <panel :turn="turn" :count="count" :cooling="cooling" @change-turn="changeTurn"></panel>
-  <game-info v-if="isGameEnd" :winner="state" @retry="retry"></gameInfo>
-</div>
-<script src="https://unpkg.com/vue@next"></script>
-<script src="app.js"></script>
-</body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script src="main.js"></script>
+  </body>
 </html>

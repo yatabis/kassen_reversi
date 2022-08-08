@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "repository": "github:yatabis/kassen_reversi",
   "scripts": {
-    "js:watch": "parcel watch front/main.js -d assets/",
-    "js:build": "parcel build front/main.js -d assets/ --no-content-hash --no-source-maps",
+    "js:watch": "parcel watch",
+    "js:build": "parcel build --no-source-maps",
     "dev": "yarn js:watch & cargo run",
     "build": "yarn js:build && cargo build"
   },
@@ -14,6 +14,17 @@
   "devDependencies": {
     "parcel": "2.7.0",
     "phina.js.d.ts": "negiwine/phina.js.d.ts"
+  },
+  "targets": {
+    "default": {
+      "source": "./front/main.js",
+      "distDir": "./assets"
+    }
+  },
+  "alias": {
+    "phina.js": {
+      "global": "phina"
+    }
   },
   "private": true
 }

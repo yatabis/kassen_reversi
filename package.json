@@ -12,7 +12,7 @@
     "phina.js": "0.2.2"
   },
   "devDependencies": {
-    "parcel-bundler": "1.12.5",
+    "parcel": "2.7.0",
     "phina.js.d.ts": "negiwine/phina.js.d.ts"
   },
   "private": true
